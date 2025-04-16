@@ -79,17 +79,23 @@ class Manager:
             return
 
         today = datetime.today()
-        recent_tasks = [
-            (index, task)
-            for index, task in enumerate(self.tasks, start=1)
-            if task.created_at is None or (today - task.created_at).days <= self.TTL
-        ]
+        
+        # Podział zadań na aktywne i przeterminowane
+        active_tasks = []
+        outdated_tasks = []
+        
+        for index, task in enumerate(self.tasks, start=1):
+            if task.created_at is None or (today - task.created_at).days <= self.TTL:
+                active_tasks.append((index, task))
+            else:
+                outdated_tasks.append((index, task))
 
-        print(colored(f"📋 List: ({self.current_list}):\n", "cyan"))
+        print(colored(f"📋 List: {self.current_list[:-5]}\n", "cyan"))
 
-        if recent_tasks:
+        # Wyświetlanie aktywnych zadań
+        if active_tasks:
             print(colored("✅ Active tasks:", "green"))
-            for i, (index, task) in enumerate(recent_tasks, 1):
+            for index, task in active_tasks:
                 task_str = colored(
                     f"[{index}] - {task.name} - {task.description} - Status: ({task.status})",
                     self.get_status_color(task.status),
@@ -97,6 +103,18 @@ class Manager:
                 print(task_str)
         else:
             print(colored("❌ No active tasks.", "red"))
+
+        # Wyświetlanie przeterminowanych zadań
+        if outdated_tasks:
+            print(colored("\n⌛ Outdated tasks:", "yellow"))
+            for index, task in outdated_tasks:
+                outdated_days = (today - task.created_at).days - self.TTL
+                task_str = colored(
+                    f"[{index}] - {task.name} - {task.description} - Status: ({task.status}) "
+                    f"(outdated by {outdated_days} days)",
+                    "yellow"
+                )
+                print(task_str)
 
     def get_status_color(self, status):
         return {"Started": "yellow", "Paused": "red", "Completed": "green"}.get(
