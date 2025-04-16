@@ -108,6 +108,12 @@ class Manager:
         )
 
     def update_task(self, task_id, status_id, list_name=None):
+        if list_name:
+            filename = f"{list_name}.json"
+            if not os.path.exists(filename):
+                print(colored(f"❌ List '{list_name}' does not exist.", "red"))
+                return
+            self.set_current_list(list_name)
         try:
             task = self.tasks[task_id - 1]
             status = self.STATUS_OPTIONS.get(str(status_id))
@@ -127,6 +133,13 @@ class Manager:
             print(colored("❌ Task with the given ID not found!", "red"))
 
     def remove_task(self, task_id, list_name=None):
+        if list_name:
+            filename = f"{list_name}.json"
+            if not os.path.exists(filename):
+                print(colored(f"❌ List '{list_name}' does not exist.", "red"))
+                return
+            self.set_current_list(list_name)
+
         if not self.tasks:
             print(colored("❌ No tasks available to remove.", "red"))
             return
