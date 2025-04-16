@@ -62,10 +62,6 @@ class Manager:
                 return
             self.set_current_list(list_name)
 
-        if not name or not description:
-            print(colored("❌ Task name and description are required!", "orange"))
-            return
-
         self.tasks.append(Task(name, description))
         self.save_tasks()
         print(colored("✅ Task added.", "green"))
@@ -114,21 +110,12 @@ class Manager:
                 print(colored(f"❌ List '{list_name}' does not exist.", "red"))
                 return
             self.set_current_list(list_name)
+
         try:
             task = self.tasks[task_id - 1]
-            status = self.STATUS_OPTIONS.get(str(status_id))
-
-            if status:
-                task.status = status
-                self.save_tasks()
-                print(colored(f"'{task.name}' Status: {task.status}", "yellow"))
-            else:
-                print(
-                    colored(
-                        "❌ Invalid status! Available statuses: 1 - Started, 2 - Paused, 3 - Completed",
-                        "red",
-                    )
-                )
+            task.status = self.STATUS_OPTIONS[str(status_id)]
+            self.save_tasks()
+            print(colored(f"'{task.name}' Status: {task.status}", "yellow"))
         except IndexError:
             print(colored("❌ Task with the given ID not found!", "red"))
 
@@ -143,18 +130,15 @@ class Manager:
         if not self.tasks:
             print(colored("❌ No tasks available to remove.", "red"))
             return
-        try:
-            task_id = int(task_id) - 1
-            if 0 <= task_id < len(self.tasks):
-                deleted_task = self.tasks.pop(task_id)
-                self.save_tasks()
-                print(
-                    colored(f"✅ Task '{deleted_task.name}' has been removed.", "green")
-                )
-            else:
-                print(colored("❌ Invalid task number.", "red"))
-        except ValueError:
-            print(colored("❌ Task ID must be a number!", "red"))
+
+        task_id = task_id - 1
+        if 0 <= task_id < len(self.tasks):
+            deleted_task = self.tasks.pop(task_id)
+            self.save_tasks()
+            print(colored(f"✅ Task '{deleted_task.name}' has been removed.", "green"))
+        else:
+            print(colored("❌ Invalid task number.", "red"))
+
 
     def delete_list(self, name):
         filename = f"{name}.json"
