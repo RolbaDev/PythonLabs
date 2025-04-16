@@ -27,9 +27,9 @@ class Manager:
         if os.path.exists(filename):
             self.current_list = filename
             self.tasks = self.load_tasks()
-            print(colored(f"List: {list_name}", "green"))
+            print(colored(f"📋 List: {list_name}", "green"))
         else:
-            print(colored(f"List '{list_name}' does not exist.", "red"))
+            print(colored(f"❌ List '{list_name}' does not exist.", "red"))
 
     def list_available_lists(self):
         files = [f[:-5] for f in os.listdir() if f.endswith(".json")]
@@ -79,18 +79,16 @@ class Manager:
             return
 
         today = datetime.today()
-        
+
         # Podział zadań na aktywne i przeterminowane
         active_tasks = []
         outdated_tasks = []
-        
+
         for index, task in enumerate(self.tasks, start=1):
             if task.created_at is None or (today - task.created_at).days <= self.TTL:
                 active_tasks.append((index, task))
             else:
                 outdated_tasks.append((index, task))
-
-        print(colored(f"📋 List: {self.current_list[:-5]}\n", "cyan"))
 
         # Wyświetlanie aktywnych zadań
         if active_tasks:
@@ -156,7 +154,6 @@ class Manager:
             print(colored(f"✅ Task '{deleted_task.name}' has been removed.", "green"))
         else:
             print(colored("❌ Invalid task number.", "red"))
-
 
     def delete_list(self, name):
         filename = f"{name}.json"
